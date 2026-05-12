@@ -1,0 +1,37 @@
+{
+  "name": "tuicr-app",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "MCP Apps review interface for tuicr.",
+  "bin": {
+    "tuicr-app": "./bin/tuicr-app.js"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -i src/ui/styles.css -o dist/styles.css --minify",
+    "build:ui": "npm run build:css && tsx scripts/build-ui.ts",
+    "build:server": "tsx scripts/build-server.ts",
+    "build": "npm run build:ui && npm run build:server",
+    "start": "npm run build && node ./bin/tuicr-app.js --no-build",
+    "test": "npm run build && tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@modelcontextprotocol/ext-apps": "^1.0.1",
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "@types/node": "^25.7.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.28.0",
+    "tailwindcss": "^4.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}

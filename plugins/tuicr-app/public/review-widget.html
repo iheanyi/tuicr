@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>tuicr review</title>
+    <style>
+      :root {
+        color: #17202a;
+        background: #f7f8fa;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #f7f8fa; }
+      button, input, textarea, select { font: inherit; }
+      button { border: 1px solid #c8d0da; background: #fff; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+      button.primary { background: #174ea6; border-color: #174ea6; color: #fff; }
+      button:disabled { opacity: .55; cursor: not-allowed; }
+      .app { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+      header { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #d8dee7; background: #fff; }
+      header strong { font-size: 15px; }
+      header .meta { color: #667085; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .layout { display: grid; grid-template-columns: minmax(210px, 280px) 1fr minmax(260px, 340px); min-height: 0; }
+      .files, .comments { border-right: 1px solid #d8dee7; background: #fff; overflow: auto; }
+      .comments { border-right: 0; border-left: 1px solid #d8dee7; }
+      .panel-title { padding: 10px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #596579; border-bottom: 1px solid #e3e7ee; }
+      .file { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 0; border-bottom: 1px solid #edf0f4; border-radius: 0; text-align: left; }
+      .file.active { background: #e9f1ff; }
+      .file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .badge { font-size: 11px; color: #4d5a6c; border: 1px solid #cdd5df; border-radius: 999px; padding: 1px 6px; }
+      .diff { min-width: 0; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.55; background: #fcfcfd; }
+      .hunk { color: #52637a; background: #eef3f8; padding: 4px 10px; border-top: 1px solid #d8dee7; border-bottom: 1px solid #d8dee7; }
+      .line { display: grid; grid-template-columns: 54px 54px 22px 1fr auto; gap: 6px; padding: 0 10px; white-space: pre; }
+      .line:hover { background: #eef6ff; }
+      .line.added { background: #edf8ef; }
+      .line.removed { background: #fff0f0; }
+      .num { color: #8a95a6; text-align: right; user-select: none; }
+      .mark { color: #667085; }
+      .content { overflow: visible; }
+      .comment-btn { padding: 0 6px; border-radius: 4px; font-family: inherit; }
+      .comment-list { padding: 10px; display: grid; gap: 8px; }
+      .comment { border: 1px solid #d8dee7; border-radius: 6px; padding: 8px; background: #fff; }
+      .comment strong { font-size: 12px; }
+      .comment p { margin: 5px 0 0; font-size: 13px; white-space: pre-wrap; }
+      .form { border-top: 1px solid #d8dee7; padding: 10px; display: grid; gap: 8px; background: #fff; }
+      .form textarea { width: 100%; min-height: 86px; border: 1px solid #c8d0da; border-radius: 6px; padding: 8px; resize: vertical; }
+      .row { display: flex; gap: 8px; align-items: center; }
+      .row select, .row input { min-width: 0; border: 1px solid #c8d0da; border-radius: 6px; padding: 6px 8px; }
+      .empty { padding: 24px; color: #667085; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      .export { width: 100%; min-height: 160px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+        .files, .comments { max-height: 240px; border: 0; border-bottom: 1px solid #d8dee7; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <strong>tuicr review</strong>
+        <span class="meta" id="repo-meta">Opening review...</span>
+        <button id="refresh">Refresh</button>
+        <button class="primary" id="export">Export</button>
+      </header>
+      <main class="layout">
+        <aside class="files">
+          <div class="panel-title">Files</div>
+          <div id="files"></div>
+        </aside>
+        <section class="diff" id="diff"></section>
+        <aside class="comments">
+          <div class="panel-title">Comments</div>
+          <div id="comments" class="comment-list"></div>
+          <div class="form">
+            <div class="row">
+              <select id="scope">
+                <option value="review">Review</option>
+                <option value="file">File</option>
+                <option value="line">Line</option>
+              </select>
+              <select id="type">
+                <option value="note">NOTE</option>
+                <option value="suggestion">SUGGESTION</option>
+                <option value="issue">ISSUE</option>
+                <option value="praise">PRAISE</option>
+              </select>
+            </div>
+            <textarea id="body" placeholder="Leave a review comment"></textarea>
+            <button class="primary" id="add">Add comment</button>
+            <textarea class="export" id="exported" readonly placeholder="Exported review markdown appears here"></textarea>
+          </div>
+        </aside>
+      </main>
+    </div>
+    <script type="module">
+      const state = { session: null, file: null, selectedLine: null, bridgeReady: null, rpcId: 0, pending: new Map() };
+      const $ = (id) => document.getElementById(id);
+      const local = window.parent === window;
+
+      function rpcRequest(method, params) {
+        return new Promise((resolve, reject) => {
+          const id = ++state.rpcId;
+          state.pending.set(id, { resolve, reject });
+          window.parent.postMessage({ jsonrpc: "2.0", id, method, params }, "*");
+        });
+      }
+      function rpcNotify(method, params) {
+        window.parent.postMessage({ jsonrpc: "2.0", method, params }, "*");
+      }
+      window.addEventListener("message", (event) => {
+        if (event.source !== window.parent) return;
+        const message = event.data;
+        if (!message || message.jsonrpc !== "2.0") return;
+        if (typeof message.id === "number") {
+          const pending = state.pending.get(message.id);
+          if (!pending) return;
+          state.pending.delete(message.id);
+          if (message.error) pending.reject(message.error);
+          else pending.resolve(message.result);
+        } else if (message.method === "ui/notifications/tool-result") {
+          updateFromToolResult(message.params);
+        }
+      });
+      async function initBridge() {
+        if (local) return;
+        await rpcRequest("ui/initialize", {
+          appInfo: { name: "tuicr-app", version: "0.1.0" },
+          appCapabilities: {},
+          protocolVersion: "2026-01-26",
+        });
+        rpcNotify("ui/notifications/initialized", {});
+      }
+      async function callTool(name, args) {
+        if (local) return callLocal(name, args);
+        await state.bridgeReady;
+        const result = await rpcRequest("tools/call", { name, arguments: args });
+        updateFromToolResult(result);
+        return result;
+      }
+      async function callLocal(name, args) {
+        if (name === "open_review") return fetchJson("/api/open", args);
+        if (name === "get_review") return fetchJson(`/api/session/${args.sessionId}`);
+        if (name === "add_comment") return fetchJson("/api/comment", args);
+        if (name === "set_file_reviewed") return fetchJson("/api/reviewed", args);
+        if (name === "export_review") return fetchJson(`/api/export/${args.sessionId}`, null, "GET");
+        throw new Error(`Unknown local tool ${name}`);
+      }
+      async function fetchJson(url, body, method = "POST") {
+        const res = await fetch(url, {
+          method,
+          headers: body ? { "content-type": "application/json" } : {},
+          body: body ? JSON.stringify(body) : undefined,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || res.statusText);
+        return { structuredContent: data, content: [] };
+      }
+      function updateFromToolResult(result) {
+        const session = result?.structuredContent?.session;
+        if (session) {
+          state.session = session;
+          if (!state.file || !session.files.find((file) => file.path === state.file.path)) {
+            state.file = session.files[0] ?? null;
+          } else {
+            state.file = session.files.find((file) => file.path === state.file.path);
+          }
+          render();
+        }
+        if (result?.structuredContent?.markdown) $("exported").value = result.structuredContent.markdown;
+      }
+      function render() {
+        const session = state.session;
+        $("repo-meta").textContent = session ? `${session.repoPath} ${session.branchName ? `(${session.branchName})` : ""}` : "No review";
+        $("files").innerHTML = "";
+        for (const file of session?.files ?? []) {
+          const button = document.createElement("button");
+          button.className = `file ${state.file?.path === file.path ? "active" : ""}`;
+          button.innerHTML = `<span>${file.path}</span><span class="badge">${file.reviewed ? "done" : file.status}</span>`;
+          button.addEventListener("click", () => { state.file = file; state.selectedLine = null; render(); });
+          $("files").appendChild(button);
+        }
+        renderDiff();
+        renderComments();
+      }
+      function renderDiff() {
+        const host = $("diff");
+        host.innerHTML = "";
+        const file = state.file;
+        if (!file) {
+          host.innerHTML = '<div class="empty">No diff files found.</div>';
+          return;
+        }
+        for (const hunk of file.hunks) {
+          const h = document.createElement("div");
+          h.className = "hunk";
+          h.textContent = hunk.header;
+          host.appendChild(h);
+          for (const line of hunk.lines) {
+            const row = document.createElement("div");
+            row.className = `line ${line.kind}`;
+            const displayLine = line.kind === "removed" ? line.oldLine : line.newLine;
+            row.innerHTML = `<span class="num">${line.oldLine ?? ""}</span><span class="num">${line.newLine ?? ""}</span><span class="mark">${line.kind === "added" ? "+" : line.kind === "removed" ? "-" : " "}</span><span class="content"></span>`;
+            row.querySelector(".content").textContent = line.content;
+            const btn = document.createElement("button");
+            btn.className = "comment-btn";
+            btn.textContent = "+";
+            btn.addEventListener("click", () => {
+              state.selectedLine = { line: displayLine, side: line.kind === "removed" ? "old" : "new" };
+              $("scope").value = "line";
+              $("body").focus();
+            });
+            row.appendChild(btn);
+            host.appendChild(row);
+          }
+        }
+      }
+      function renderComments() {
+        const host = $("comments");
+        host.innerHTML = "";
+        const comments = [];
+        for (const comment of state.session?.reviewComments ?? []) comments.push({ ...comment, label: "Review" });
+        for (const file of state.session?.files ?? []) {
+          for (const comment of file.fileComments ?? []) comments.push({ ...comment, label: file.path });
+          for (const comment of file.lineComments ?? []) comments.push({ ...comment, label: `${file.path}:${comment.line}` });
+        }
+        if (comments.length === 0) {
+          host.innerHTML = '<div class="empty">No comments yet.</div>';
+          return;
+        }
+        for (const comment of comments) {
+          const el = document.createElement("div");
+          el.className = "comment";
+          el.innerHTML = `<strong>[${comment.type.toUpperCase()}] ${comment.label}</strong><p></p>`;
+          el.querySelector("p").textContent = comment.body;
+          host.appendChild(el);
+        }
+      }
+      async function openReview() {
+        const result = await callTool("open_review", {});
+        updateFromToolResult(result);
+      }
+      $("refresh").addEventListener("click", openReview);
+      $("export").addEventListener("click", async () => {
+        if (!state.session) return;
+        const result = await callTool("export_review", { sessionId: state.session.id });
+        updateFromToolResult(result);
+      });
+      $("add").addEventListener("click", async () => {
+        if (!state.session) return;
+        const scope = $("scope").value;
+        const payload = {
+          sessionId: state.session.id,
+          scope,
+          type: $("type").value,
+          body: $("body").value.trim(),
+        };
+        if (!payload.body) return;
+        if (scope === "file" || scope === "line") payload.path = state.file?.path;
+        if (scope === "line") {
+          payload.line = state.selectedLine?.line;
+          payload.side = state.selectedLine?.side ?? "new";
+        }
+        const result = await callTool("add_comment", payload);
+        updateFromToolResult(result);
+        $("body").value = "";
+      });
+      state.bridgeReady = initBridge();
+      openReview().catch((error) => {
+        $("repo-meta").textContent = error.message;
+      });
+    </script>
+  </body>
+</html>

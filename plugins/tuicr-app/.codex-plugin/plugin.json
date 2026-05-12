@@ -1,0 +1,32 @@
+{
+  "name": "tuicr-app",
+  "version": "0.1.0",
+  "description": "Review local code changes through a tuicr-inspired MCP Apps interface.",
+  "author": {
+    "name": "tuicr",
+    "url": "https://github.com/agavra/tuicr"
+  },
+  "homepage": "https://github.com/agavra/tuicr",
+  "repository": "https://github.com/agavra/tuicr",
+  "license": "MIT",
+  "keywords": ["tuicr", "code-review", "mcp", "apps-sdk", "codex"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "tuicr App",
+    "shortDescription": "Review diffs with an MCP Apps UI",
+    "longDescription": "tuicr App exposes a local MCP Apps server and review UI for leaving review-level, file-level, and line-level comments on local git diffs, then exporting agent-ready Markdown.",
+    "developerName": "tuicr",
+    "category": "Coding",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://github.com/agavra/tuicr",
+    "privacyPolicyURL": "https://github.com/agavra/tuicr",
+    "termsOfServiceURL": "https://github.com/agavra/tuicr/blob/main/LICENSE",
+    "defaultPrompt": [
+      "Open tuicr App for this repo",
+      "Export my tuicr App review"
+    ],
+    "brandColor": "#174EA6",
+    "screenshots": []
+  }
+}

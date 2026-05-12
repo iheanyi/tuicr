@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "tuicr-app": {
+      "command": "node",
+      "args": ["./bin/tuicr-app.js", "--stdio"],
+      "cwd": "."
+    }
+  }
+}

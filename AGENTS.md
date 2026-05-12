@@ -66,6 +66,8 @@ src/
 
 Repository-managed agent integrations:
 - `skills/tuicr/` - Shared agent skill bundle for coding agents, for example Claude Code, Codex, and similar tools; launches tuicr in a tmux split pane
+- `skills/tuicr-app/` - Agent skill for the MCP Apps review interface
+- `plugins/tuicr-app/` - Node MCP Apps server with `tuicr-app` CLI executable, Streamable HTTP `/mcp`, local `/preview`, and review/export tools
 
 ### Key Types
 

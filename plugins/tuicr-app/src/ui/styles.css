@@ -1,0 +1,977 @@
+@import "tailwindcss";
+
+@source "./**/*.{ts,tsx}";
+
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --color-tuicr: #174ea6;
+}
+
+@layer base {
+  :root {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    height: auto;
+  }
+
+  body {
+    @apply m-0 bg-neutral-50 text-neutral-900 antialiased;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed opacity-55;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply isolate grid min-h-dvh grid-rows-[auto_auto_auto_1fr] bg-neutral-50;
+    background-image: linear-gradient(180deg, rgb(234 240 246 / 0.8), rgb(250 250 250 / 0) 220px);
+  }
+
+  .app-shell.embedded {
+    min-height: min(980px, max(760px, 140vh));
+  }
+
+  .topbar {
+    @apply flex items-center justify-between gap-4 border-b border-neutral-950/10 bg-white/90 p-3 backdrop-blur-md sm:p-4;
+  }
+
+  .embedded .topbar {
+    @apply p-3;
+  }
+
+  .brand-block,
+  .toolbar,
+  .file-main,
+  .diff-actions,
+  .panel-header,
+  .export-actions,
+  .line-chip,
+  .error-banner {
+    @apply flex items-center;
+  }
+
+  .brand-block {
+    @apply min-w-0 gap-2.5;
+  }
+
+  .brand-mark {
+    @apply grid size-8 place-items-center rounded-lg border border-tuicr/30 bg-blue-50;
+  }
+
+  .brand-mark svg {
+    @apply size-4 shrink-0 fill-tuicr;
+  }
+
+  .button svg,
+  .search-box svg,
+  .line-chip svg,
+  .diff-line button svg,
+  .file-main svg,
+  .error-banner svg,
+  .select-wrap svg {
+    @apply size-4 shrink-0;
+  }
+
+  h1,
+  h2,
+  p {
+    @apply m-0;
+  }
+
+  h1 {
+    @apply text-lg font-semibold tracking-normal;
+  }
+
+  h2 {
+    @apply text-sm font-semibold tracking-normal;
+  }
+
+  .brand-block p,
+  .panel-header p,
+  .diff-header p,
+  .file-main small,
+  .empty-state span {
+    @apply text-xs text-neutral-500;
+  }
+
+  .brand-block p {
+    @apply max-w-[58vw] overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+
+  .toolbar {
+    @apply gap-2;
+  }
+
+  .button {
+    @apply inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-0 px-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500;
+  }
+
+  .button.primary {
+    @apply bg-tuicr text-white ring-1 ring-tuicr;
+  }
+
+  .button.secondary {
+    @apply bg-white text-neutral-800 ring-1 ring-neutral-950/10;
+  }
+
+  .button.ghost {
+    @apply bg-transparent text-neutral-700 ring-1 ring-neutral-950/10;
+  }
+
+  .button.full {
+    @apply w-full;
+  }
+
+  .compact-button {
+    @apply h-7 px-2;
+  }
+
+  .export-actions {
+    @apply shrink-0 gap-1.5;
+  }
+
+  .select-wrap {
+    @apply relative grid min-w-38;
+  }
+
+  .select-wrap span {
+    @apply sr-only;
+  }
+
+  .select-wrap select,
+  .form-grid select,
+  .search-box input,
+  .composer textarea,
+  .export-card textarea {
+    @apply w-full rounded-lg border-0 bg-white text-neutral-800 ring-1 ring-neutral-950/15 focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500;
+  }
+
+  .select-wrap select,
+  .form-grid select {
+    @apply h-8 appearance-none pr-8 pl-2.5 text-sm;
+  }
+
+  .select-wrap svg {
+    @apply pointer-events-none absolute top-2 right-2.5 fill-neutral-500;
+  }
+
+  .error-banner {
+    @apply mx-4 mt-3 justify-between gap-3 rounded-lg border border-amber-700/25 bg-amber-50 p-2.5 text-sm text-amber-900;
+  }
+
+  .error-banner button {
+    @apply grid place-items-center border-0 bg-transparent text-amber-900;
+  }
+
+  .stats-strip {
+    @apply mx-4 my-3 grid grid-cols-5 rounded-lg border border-neutral-950/10 bg-white;
+  }
+
+  .embedded .stats-strip {
+    @apply mx-3 my-2;
+  }
+
+  .stat {
+    @apply min-w-0 border-l border-neutral-950/10 px-3.5 py-2.5 first:border-l-0;
+  }
+
+  .embedded .stat {
+    @apply px-3 py-2;
+  }
+
+  .stat span {
+    @apply block overflow-hidden text-ellipsis whitespace-nowrap text-xs text-neutral-500;
+  }
+
+  .stat strong {
+    @apply mt-0.5 block text-lg font-semibold tabular-nums;
+  }
+
+  .stat.done strong,
+  .stat.added strong {
+    @apply text-green-700;
+  }
+
+  .stat.comment strong {
+    @apply text-tuicr;
+  }
+
+  .stat.removed strong {
+    @apply text-red-700;
+  }
+
+  .workspace {
+    @apply grid min-h-0 grid-cols-[minmax(240px,300px)_minmax(0,1fr)_minmax(300px,360px)] border-t border-neutral-950/10;
+  }
+
+  .embedded .workspace {
+    @apply border-t-0;
+  }
+
+  .file-panel,
+  .review-panel {
+    @apply min-h-0 bg-white;
+  }
+
+  .file-panel {
+    @apply grid grid-rows-[auto_auto_auto_1fr] border-r border-neutral-950/10;
+  }
+
+  .review-panel {
+    @apply grid content-start gap-3 overflow-auto border-l border-neutral-950/10 p-3;
+  }
+
+  .panel-header {
+    @apply justify-between gap-3 p-3;
+  }
+
+  .panel-header.compact {
+    @apply p-0;
+  }
+
+  .search-box {
+    @apply mx-3 mb-2.5 grid grid-cols-[auto_1fr] items-center gap-2 rounded-lg bg-white;
+  }
+
+  .search-box svg {
+    @apply z-1 col-start-1 row-start-1 ml-2.5 fill-neutral-500;
+  }
+
+  .search-box input {
+    @apply col-span-full row-start-1 h-8 pr-2.5 pl-8 text-sm;
+  }
+
+  .segmented {
+    @apply mx-3 mb-2.5 grid grid-cols-4 gap-0.5 rounded-lg bg-neutral-100 p-0.5;
+  }
+
+  .segmented button {
+    @apply rounded-md border-0 bg-transparent px-1 py-1 text-xs text-neutral-600;
+  }
+
+  .segmented button.active {
+    @apply bg-white text-neutral-900 shadow-sm;
+  }
+
+  .file-list {
+    @apply overflow-auto;
+  }
+
+  .file-row {
+    @apply flex w-full items-center justify-between gap-2.5 rounded-none border-0 border-t border-neutral-950/10 bg-white p-3 text-left text-neutral-800 hover:bg-blue-50;
+  }
+
+  .file-row.active {
+    @apply bg-blue-50;
+  }
+
+  .file-main {
+    @apply min-w-0 gap-2;
+  }
+
+  .file-main svg {
+    @apply fill-neutral-500;
+  }
+
+  .file-main span {
+    @apply min-w-0;
+  }
+
+  .file-main strong,
+  .file-main small {
+    @apply block overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+
+  .file-main strong {
+    @apply text-sm font-semibold;
+  }
+
+  .status-pill {
+    @apply shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-semibold text-neutral-600;
+  }
+
+  .status-pill.added,
+  .status-pill.reviewed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .status-pill.deleted {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .status-pill.renamed,
+  .status-pill.copied {
+    @apply bg-amber-100 text-amber-800;
+  }
+
+  .diff-panel {
+    @apply grid min-h-0 min-w-0 grid-rows-[auto_1fr] bg-neutral-50;
+  }
+
+  .diff-header {
+    @apply flex min-w-0 items-center justify-between gap-3 border-b border-neutral-950/10 bg-white p-3.5;
+  }
+
+  .diff-header div {
+    @apply min-w-0;
+  }
+
+  .diff-header h2 {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+
+  .diff-body {
+    @apply overflow-auto font-mono text-xs;
+    line-height: 1.55;
+  }
+
+  .hunk-block {
+    @apply border-b border-neutral-950/10;
+  }
+
+  .hunk-header {
+    @apply sticky top-0 z-1 border-b border-neutral-950/10 bg-slate-100 px-3 py-1.5 text-neutral-600;
+  }
+
+  .diff-line {
+    @apply grid min-w-full grid-cols-[54px_54px_22px_minmax(0,1fr)_34px] items-start gap-1.5 px-2 whitespace-pre hover:bg-blue-50;
+  }
+
+  .diff-line.selectable {
+    @apply cursor-pointer;
+  }
+
+  .diff-line.added {
+    @apply bg-green-50;
+  }
+
+  .diff-line.removed {
+    @apply bg-red-50;
+  }
+
+  .diff-line.selected {
+    @apply bg-blue-50;
+    box-shadow: inset 3px 0 0 #174ea6;
+  }
+
+  .line-num {
+    @apply select-none text-right text-neutral-400 tabular-nums;
+  }
+
+  .line-mark {
+    @apply select-none text-neutral-500;
+  }
+
+  .diff-line code {
+    @apply min-w-0 overflow-hidden text-ellipsis font-mono;
+    font-size: inherit;
+  }
+
+  .diff-line button {
+    @apply mt-px grid size-6 place-items-center rounded-md border-0 bg-transparent text-neutral-600 opacity-0 transition hover:bg-tuicr/10 focus:opacity-100 disabled:pointer-events-none disabled:opacity-0;
+    pointer-events: none;
+  }
+
+  .diff-line:hover button,
+  .diff-line:focus-within button,
+  .diff-line.selected button {
+    @apply opacity-100;
+    pointer-events: auto;
+  }
+
+  .diff-line button svg {
+    @apply fill-current;
+  }
+
+  .panel-card {
+    @apply grid gap-2.5 rounded-lg border border-neutral-950/10 bg-white p-3;
+  }
+
+  .form-grid {
+    @apply grid grid-cols-2 gap-2;
+  }
+
+  .form-grid label {
+    @apply grid gap-1;
+  }
+
+  .form-grid span {
+    @apply text-xs text-neutral-500;
+  }
+
+  .line-chip {
+    @apply justify-self-start gap-1.5 rounded-full border-0 bg-blue-50 px-2 py-1 text-xs font-semibold text-tuicr;
+  }
+
+  .line-chip svg {
+    @apply fill-current;
+  }
+
+  .composer textarea,
+  .export-card textarea {
+    @apply min-h-24 resize-y p-2.5 text-sm;
+  }
+
+  .export-card textarea {
+    @apply min-h-40 font-mono text-xs;
+  }
+
+  .comment-list {
+    @apply grid max-h-[36vh] gap-2 overflow-auto;
+  }
+
+  .comment-card {
+    @apply rounded-lg border-l-3 border-l-neutral-400 bg-neutral-50 p-2.5;
+  }
+
+  .comment-card.issue {
+    @apply border-l-red-600;
+  }
+
+  .comment-card.suggestion {
+    @apply border-l-tuicr;
+  }
+
+  .comment-card.praise {
+    @apply border-l-green-600;
+  }
+
+  .comment-card header {
+    @apply flex justify-between gap-2 text-xs text-neutral-600;
+  }
+
+  .comment-card header span {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+
+  .comment-card p {
+    @apply mt-1 text-sm whitespace-pre-wrap text-neutral-800;
+  }
+
+  .empty-state {
+    @apply grid min-h-56 place-items-center p-7 text-center text-neutral-500;
+  }
+
+  .empty-state.compact {
+    @apply min-h-22 p-4;
+  }
+
+  .empty-state p {
+    @apply text-sm font-semibold text-neutral-700;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background: #0f1217;
+    color: #e5e7eb;
+  }
+
+  .app-shell {
+    background-color: #0f1217;
+    color: #e5e7eb;
+    background-image: linear-gradient(180deg, rgb(23 33 48 / 0.9), rgb(15 18 23 / 0) 220px);
+  }
+
+  .topbar,
+  .file-panel,
+  .review-panel,
+  .diff-header,
+  .panel-card,
+  .stats-strip,
+  .search-box input,
+  .select-wrap select,
+  .form-grid select,
+  .composer textarea,
+  .export-card textarea {
+    background-color: #171b22;
+    color: #f3f4f6;
+  }
+
+  .topbar,
+  .stats-strip,
+  .workspace,
+  .file-panel,
+  .review-panel,
+  .diff-header,
+  .hunk-block,
+  .hunk-header,
+  .panel-card,
+  .stat,
+  .file-row {
+    border-color: rgb(255 255 255 / 0.12);
+  }
+
+  .brand-mark,
+  .button.secondary,
+  .button.ghost,
+  .segmented,
+  .status-pill,
+  .comment-card {
+    background-color: #202631;
+  }
+
+  .brand-mark {
+    border-color: rgb(125 175 255 / 0.35);
+  }
+
+  .brand-mark svg,
+  .stat.comment strong {
+    fill: #7dafff;
+    color: #7dafff;
+  }
+
+  .button.primary {
+    background-color: #2f6fdb;
+    color: #ffffff;
+    --tw-ring-color: #2f6fdb;
+  }
+
+  .button.secondary,
+  .button.ghost {
+    color: #e5e7eb;
+    --tw-ring-color: rgb(255 255 255 / 0.14);
+  }
+
+  .brand-block p,
+  .panel-header p,
+  .diff-header p,
+  .file-main small,
+  .empty-state span,
+  .form-grid span,
+  .stat span,
+  .line-num {
+    color: #9ca3af;
+  }
+
+  .select-wrap select,
+  .form-grid select,
+  .search-box input,
+  .composer textarea,
+  .export-card textarea {
+    --tw-ring-color: rgb(255 255 255 / 0.14);
+  }
+
+  .search-box svg,
+  .file-main svg,
+  .select-wrap svg,
+  .line-mark,
+  .diff-line button {
+    color: #9ca3af;
+    fill: #9ca3af;
+  }
+
+  .segmented {
+    background-color: #111827;
+  }
+
+  .segmented button {
+    color: #a3aab7;
+  }
+
+  .segmented button.active {
+    background-color: #273142;
+    color: #f3f4f6;
+    box-shadow: none;
+  }
+
+  .file-row {
+    background-color: #171b22;
+    color: #e5e7eb;
+  }
+
+  .file-row:hover,
+  .file-row.active,
+  .diff-line:hover,
+  .diff-line.selected {
+    background-color: rgb(47 111 219 / 0.18);
+  }
+
+  .diff-panel {
+    background-color: #11151b;
+  }
+
+  .hunk-header {
+    background-color: #202631;
+    color: #cbd5e1;
+  }
+
+  .diff-line.added {
+    background-color: rgb(20 83 45 / 0.32);
+  }
+
+  .diff-line.removed {
+    background-color: rgb(127 29 29 / 0.32);
+  }
+
+  .diff-line.selected {
+    box-shadow: inset 3px 0 0 #7dafff;
+  }
+
+  .diff-line code,
+  .file-main strong,
+  .comment-card p,
+  .empty-state p {
+    color: #f3f4f6;
+  }
+
+  .line-chip {
+    background-color: rgb(47 111 219 / 0.18);
+    color: #93c5fd;
+  }
+
+  .status-pill {
+    color: #cbd5e1;
+  }
+
+  .status-pill.added,
+  .status-pill.reviewed {
+    background-color: rgb(20 83 45 / 0.45);
+    color: #86efac;
+  }
+
+  .status-pill.deleted {
+    background-color: rgb(127 29 29 / 0.45);
+    color: #fca5a5;
+  }
+
+  .status-pill.renamed,
+  .status-pill.copied {
+    background-color: rgb(120 53 15 / 0.45);
+    color: #fcd34d;
+  }
+
+  .stat.done strong,
+  .stat.added strong {
+    color: #86efac;
+  }
+
+  .stat.removed strong {
+    color: #fca5a5;
+  }
+
+  .comment-card {
+    color: #e5e7eb;
+  }
+
+  .comment-card header {
+    color: #cbd5e1;
+  }
+
+  .error-banner {
+    border-color: rgb(251 191 36 / 0.35);
+    background-color: rgb(120 53 15 / 0.4);
+    color: #fde68a;
+  }
+
+  .error-banner button {
+    color: #fde68a;
+  }
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] body {
+  background: #0f1217;
+  color: #e5e7eb;
+}
+
+html[data-theme="dark"] .app-shell {
+  background-color: #0f1217;
+  color: #e5e7eb;
+  background-image: linear-gradient(180deg, rgb(23 33 48 / 0.9), rgb(15 18 23 / 0) 220px);
+}
+
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .file-panel,
+html[data-theme="dark"] .review-panel,
+html[data-theme="dark"] .diff-header,
+html[data-theme="dark"] .panel-card,
+html[data-theme="dark"] .stats-strip,
+html[data-theme="dark"] .search-box input,
+html[data-theme="dark"] .select-wrap select,
+html[data-theme="dark"] .form-grid select,
+html[data-theme="dark"] .composer textarea,
+html[data-theme="dark"] .export-card textarea,
+html[data-theme="dark"] .file-row {
+  background-color: #171b22;
+  color: #f3f4f6;
+}
+
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .stats-strip,
+html[data-theme="dark"] .workspace,
+html[data-theme="dark"] .file-panel,
+html[data-theme="dark"] .review-panel,
+html[data-theme="dark"] .diff-header,
+html[data-theme="dark"] .hunk-block,
+html[data-theme="dark"] .hunk-header,
+html[data-theme="dark"] .panel-card,
+html[data-theme="dark"] .stat,
+html[data-theme="dark"] .file-row {
+  border-color: rgb(255 255 255 / 0.12);
+}
+
+html[data-theme="dark"] .brand-mark,
+html[data-theme="dark"] .button.secondary,
+html[data-theme="dark"] .button.ghost,
+html[data-theme="dark"] .segmented,
+html[data-theme="dark"] .status-pill,
+html[data-theme="dark"] .comment-card {
+  background-color: #202631;
+}
+
+html[data-theme="dark"] .brand-mark {
+  border-color: rgb(125 175 255 / 0.35);
+}
+
+html[data-theme="dark"] .brand-mark svg,
+html[data-theme="dark"] .stat.comment strong {
+  fill: #7dafff;
+  color: #7dafff;
+}
+
+html[data-theme="dark"] .button.primary {
+  background-color: #2f6fdb;
+  color: #ffffff;
+  --tw-ring-color: #2f6fdb;
+}
+
+html[data-theme="dark"] .button.secondary,
+html[data-theme="dark"] .button.ghost {
+  color: #e5e7eb;
+  --tw-ring-color: rgb(255 255 255 / 0.14);
+}
+
+html[data-theme="dark"] .brand-block p,
+html[data-theme="dark"] .panel-header p,
+html[data-theme="dark"] .diff-header p,
+html[data-theme="dark"] .file-main small,
+html[data-theme="dark"] .empty-state span,
+html[data-theme="dark"] .form-grid span,
+html[data-theme="dark"] .stat span,
+html[data-theme="dark"] .line-num {
+  color: #9ca3af;
+}
+
+html[data-theme="dark"] .select-wrap select,
+html[data-theme="dark"] .form-grid select,
+html[data-theme="dark"] .search-box input,
+html[data-theme="dark"] .composer textarea,
+html[data-theme="dark"] .export-card textarea {
+  --tw-ring-color: rgb(255 255 255 / 0.14);
+}
+
+html[data-theme="dark"] .search-box svg,
+html[data-theme="dark"] .file-main svg,
+html[data-theme="dark"] .select-wrap svg,
+html[data-theme="dark"] .line-mark,
+html[data-theme="dark"] .diff-line button {
+  color: #9ca3af;
+  fill: #9ca3af;
+}
+
+html[data-theme="dark"] .segmented {
+  background-color: #111827;
+}
+
+html[data-theme="dark"] .segmented button {
+  color: #a3aab7;
+}
+
+html[data-theme="dark"] .segmented button.active {
+  background-color: #273142;
+  color: #f3f4f6;
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .file-row:hover,
+html[data-theme="dark"] .file-row.active,
+html[data-theme="dark"] .diff-line:hover,
+html[data-theme="dark"] .diff-line.selected {
+  background-color: rgb(47 111 219 / 0.18);
+}
+
+html[data-theme="dark"] .diff-panel {
+  background-color: #11151b;
+}
+
+html[data-theme="dark"] .hunk-header {
+  background-color: #202631;
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .diff-line.added {
+  background-color: rgb(20 83 45 / 0.32);
+}
+
+html[data-theme="dark"] .diff-line.removed {
+  background-color: rgb(127 29 29 / 0.32);
+}
+
+html[data-theme="dark"] .diff-line.selected {
+  box-shadow: inset 3px 0 0 #7dafff;
+}
+
+html[data-theme="dark"] .diff-line code,
+html[data-theme="dark"] .file-main strong,
+html[data-theme="dark"] .comment-card p,
+html[data-theme="dark"] .empty-state p {
+  color: #f3f4f6;
+}
+
+html[data-theme="dark"] .line-chip {
+  background-color: rgb(47 111 219 / 0.18);
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .status-pill {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .status-pill.added,
+html[data-theme="dark"] .status-pill.reviewed {
+  background-color: rgb(20 83 45 / 0.45);
+  color: #86efac;
+}
+
+html[data-theme="dark"] .status-pill.deleted {
+  background-color: rgb(127 29 29 / 0.45);
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .status-pill.renamed,
+html[data-theme="dark"] .status-pill.copied {
+  background-color: rgb(120 53 15 / 0.45);
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .stat.done strong,
+html[data-theme="dark"] .stat.added strong {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .stat.removed strong {
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .comment-card {
+  color: #e5e7eb;
+}
+
+html[data-theme="dark"] .comment-card header {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .error-banner {
+  border-color: rgb(251 191 36 / 0.35);
+  background-color: rgb(120 53 15 / 0.4);
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .error-banner button {
+  color: #fde68a;
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    @apply grid-cols-[minmax(220px,280px)_minmax(0,1fr)];
+  }
+
+  .review-panel {
+    @apply col-span-full grid-cols-3 border-t border-l-0 border-neutral-950/10;
+  }
+
+  .comment-list {
+    @apply max-h-64;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar,
+  .diff-header {
+    @apply flex-col items-stretch;
+  }
+
+  .toolbar {
+    @apply grid grid-cols-2;
+  }
+
+  .select-wrap {
+    @apply col-span-full;
+  }
+
+  .stats-strip {
+    @apply grid-cols-2;
+  }
+
+  .stat {
+    @apply border-t border-neutral-950/10;
+  }
+
+  .stat:first-child,
+  .stat:nth-child(2) {
+    @apply border-t-0;
+  }
+
+  .workspace,
+  .review-panel {
+    @apply grid-cols-1;
+  }
+
+  .embedded.app-shell {
+    min-height: 1100px;
+  }
+
+  .file-panel {
+    @apply max-h-72 border-r-0 border-b border-neutral-950/10;
+  }
+
+  .review-panel {
+    @apply p-2.5;
+  }
+
+  .button,
+  .select-wrap select,
+  .form-grid select,
+  .search-box input {
+    @apply min-h-10 text-base;
+  }
+
+  .composer textarea {
+    @apply text-base;
+  }
+}
+
+@media (hover: none) {
+  .diff-line button {
+    @apply opacity-100;
+    pointer-events: auto;
+  }
+}

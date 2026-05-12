@@ -379,6 +379,22 @@ It opens tuicr in a tmux split pane so you can review changes interactively and 
 
 **Usage:** `/tuicr` or ask your coding agent to "review my changes with tuicr".
 
+tuicr also ships an experimental MCP Apps integration at `plugins/tuicr-app/`.
+It exposes a stdio MCP server for Claude Desktop, a Streamable HTTP MCP
+endpoint for compatible hosts, and a web review component for local preview.
+
+```bash
+cd plugins/tuicr-app
+npm install
+npm exec -- tuicr-app --repo /path/to/repo
+```
+
+Open `http://localhost:8787/preview?repoPath=<encoded repo path>` for a local
+browser preview, connect an MCP Apps host to `http://localhost:8787/mcp`, or run
+the CLI with `--stdio` from Claude Desktop. `open_review` renders the app, while
+`get_review` and `get_file_diff` return model-readable review data without
+creating duplicate app embeds. See `docs/tuicr-app.md`.
+
 ### Claude Code
 
 **Prerequisites:** Claude Code running inside tmux, tuicr installed.
